@@ -5,15 +5,15 @@ var Container = PIXI.Container,
     resources = PIXI.loader.resources,
     Sprite = PIXI.Sprite,
     TextureCache = PIXI.utils.TextureCache,
-    Rectangle = PIXI.Rectangle;
+    Texture = PIXI.Texture;
 
 //Create a Pixi stage and renderer and add the
 //renderer.view to the DOM
-var stage = new Container,
+var stage = new Container(),
     renderer = autoDetectRenderer(512,512);
 document.body.appendChild(renderer.view);
 
-  loader
+loader
   .add("images/treasureHunter.json")
   .load(setup);
 
@@ -26,7 +26,7 @@ function setup() {
     stage.addChild(dungeon);
     //2. Access the texture using the loader's `resources`:
     explorer = new Sprite(
-      resources["images/treasureHunter.json"].texture["explorer.png"]
+      resources["images/treasureHunter.json"].textures["explorer.png"]
     );
     explorer.x = 68;
     explorer.y = stage.height / 2 - explorer.height / 2;
@@ -35,7 +35,7 @@ function setup() {
     id = PIXI.loader.resources["images/treasureHunter.json"].textures;
 
     treasure = new Sprite(id["treasure.png"]);
-    treasure.x = stage.width -treasure.width - 48;
+    treasure.x = stage.width - treasure.width - 48;
     treasure.y = stage.height / 2 - treasure.height / 2;
     stage.addChild(treasure);
 
@@ -43,7 +43,7 @@ function setup() {
     door.position.set(32, 0);
     stage.addChild(door);
 
-    var = numberOfBlobs = 6,
+    var numberOfBlobs = 6,
           spacing = 48,
           xOffset = 150;
 
