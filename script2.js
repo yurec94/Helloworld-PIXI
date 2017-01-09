@@ -3,37 +3,62 @@ var Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
     loader = PIXI.loader,
     resources = PIXI.loader.resources,
-    Sprite = PIXI.Sprite;
-    Rectangle = PIXI.Rectangle;
+    Sprite = PIXI.Sprite,
+    TextureCache = PIXI.utils.TextureCache,
+    Texture = PIXI.Texture;
+
 //Create a Pixi stage and renderer and add the
 //renderer.view to the DOM
-var stage = new Container,
-    renderer = autoDetectRenderer(256,256);
-    document.body.appendChild(renderer.view);
-//load an image and run the `setup` function when it's done
-  loader
-  .add(["images/cat.png", "images/tilesets.png"])
-  .on("progress", loadProgressHandler)
+var stage = new Container(),
+    renderer = autoDetectRenderer(512,512);
+document.body.appendChild(renderer.view);
+
+loader
+  .add("images/treasureHunter.json")
   .load(setup);
-  function loadProgressHandler(loader, resource){
-    console.log("loading: " + resource.url);
-    console.log("progress: " + loader.progress.toFixed(2) + "%" );
-  }////
 
-  function setup() {
-    console.log("setup");
-  var texture = TextureCache["images/tilesets.png"]
-  var rectangle = new Rectangle(192, 128, 64, 64);
-  texture.frame = rectangle;
-  var rocket = new Sprite(texture);
-  stage.addChild(rocket);
+var dungeon, explorer, treasure, door, id;
 
-  var cat = new Sprite(resources["images/cat.png"].texture);
-  cat.position.set(128,128);
-  cat.anchor.set(0.5,0.5)
-  cat.rotation = 1.57;
-  stage.addChild(cat);
+function setup() {
+    //1. Access the `TextureCache` directly
+    var dungeonTexture = TextureCache["dungeon.png"];
+    dungeon = new Sprite(dungeonTexture);
+    stage.addChild(dungeon);
+    //2. Access the texture using the loader's `resources`:
+    explorer = new Sprite(
+      resources["images/treasureHunter.json"].textures["explorer.png"]
+    );
+    explorer.x = 68;
+    explorer.y = stage.height / 2 - explorer.height / 2;
+    stage.addChild(explorer);
 
-  renderer.render(stage);
+    id = PIXI.loader.resources["images/treasureHunter.json"].textures;
 
+    treasure = new Sprite(id["treasure.png"]);
+    treasure.x = stage.width - treasure.width - 48;
+    treasure.y = stage.height / 2 - treasure.height / 2;
+    stage.addChild(treasure);
+
+    door = new Sprite(id["door.png"]);
+    door.position.set(32, 0);
+    stage.addChild(door);
+
+    var numberOfBlobs = 6,
+          spacing = 48,
+          xOffset = 150;
+
+    for (var i = 0; i < numberOfBlobs; i++) {
+      var blob = new Sprite(id["blob.png"]);
+
+      var x = spacing * i + xOffset;
+      var y = randomInt(0, stage.height - blob.height);
+
+      blob.x = x;
+      blob.y = y;
+      stage.addChild(blob);
+    }
+    renderer.render(stage);
   }
+function randomInt(min, max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
